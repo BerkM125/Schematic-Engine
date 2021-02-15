@@ -1,0 +1,11 @@
+﻿  interaction.cpp
+C:\Berkan\VisualStudio\schematic_engine\interaction.cpp(23,17): warning C4018: '<': signed/unsigned mismatch
+C:\Berkan\VisualStudio\schematic_engine\interaction.cpp(86,6): warning C4101: 'index': unreferenced local variable
+C:\Berkan\VisualStudio\schematic_engine\interaction.cpp(189,21): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Berkan\VisualStudio\schematic_engine\interaction.cpp(193,21): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+  Generating code
+  2 of 204 functions ( 1.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  schematic_engine.vcxproj -> C:\Berkan\VisualStudio\schematic_engine\Release\schematic_engine.exe
