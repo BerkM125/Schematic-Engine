@@ -21,7 +21,7 @@ void mouseup(int x, int y) {
 	sprintf(string, "%d %d %d %d", oldx1, oldy1, dragx2, dragy2);
 	if (dragx1 != UNDEFCOORD && dragy1 != UNDEFCOORD) {
 		for (i = 0; i < line.size(); i++) {
-			if (oldx1 == line[i].params[0] && oldy1 == line[i].params[1]) {
+			if (oldx1 >= line[i].params[0] && oldx1 <= line[i].params[0]+XTOLERANCE && oldy1 >= line[i].params[1] && oldy1 <= line[i].params[1]+YTOLERANCE && strcmp(line[i].command, "wire") != 0) {
 				matchingcomp = true;
 				break;
 			}
@@ -34,10 +34,6 @@ void mouseup(int x, int y) {
 		dy = line[i].params[3] - line[i].params[1];
 		line[i].params[0] = dragx2;
 		line[i].params[1] = dragy2;
-		if (strcmp(line[i].command, "wire") == 0) {
-			line[i].params[2] = dragx1 + dx;
-			line[i].params[3] = dragy1 + dy;
-		}
 		maingraph.Clear(Color(255, 255, 255));
 		renderboard(boardfn, 1);
 		rendergrid(memdc);
@@ -192,6 +188,18 @@ void pushcomponent(struct instruct temp, int selectedcomponent, int fx, int fy, 
 		case SERVO:
 			temp.params[3] = 9.4;
 			strcpy(temp.command, "servo");
+			break;
+		case MICRO:
+			temp.params[3] = 32;
+			strcpy(temp.command, "micro");
+			break;
+		case BUZZER:
+			temp.params[3] = 125;
+			strcpy(temp.command, "buzzer");
+			break;
+		case NANO:
+			temp.params[3] = 125;
+			strcpy(temp.command, "nano");
 			break;
 		default:
 			break;

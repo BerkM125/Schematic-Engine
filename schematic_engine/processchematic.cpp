@@ -25,6 +25,9 @@ Image* ultrasonichz;
 Image* infraredhz;
 Image* nrfhz;
 Image* servo;
+Image* micro; 
+Image* buzzer;
+Image* nano;
 std::vector<struct instruct> line;
 bool invokestate = false;
 
@@ -73,6 +76,9 @@ void configurepensettings(Graphics *graph, Pen *mainpen, Pen *negativepen, Pen *
 		infraredhz = Image::FromFile(L"infraredhz.png");
 		nrfhz = Image::FromFile(L"nrfhz.PNG");
 		servo = Image::FromFile(L"servo.PNG");
+		micro = Image::FromFile(L"micro.PNG");
+		buzzer = Image::FromFile(L"buzzer.PNG");
+		nano = Image::FromFile(L"nano.PNG");
 	}
 	return;
 }
@@ -263,6 +269,24 @@ void processcommand(struct instruct cmd) {
 				comp.compimg = servo;
 				wsprintf(comp.unit, L"%dkg/cm", comp.compval);
 			}
+			if (strcmp(cmd.command, "micro") == 0) {
+				comp.comptype = MICRO;
+				comp.setrenderingcoords((gridstep / 2), (gridstep / 2), 20, 7.2);
+				comp.compimg = micro;
+				wsprintf(comp.unit, L"32u4");
+			}
+			if (strcmp(cmd.command, "buzzer") == 0) {
+				comp.comptype = BUZZER;
+				comp.setrenderingcoords((gridstep / 2), (gridstep / 2), 7, 4.8);
+				comp.compimg = buzzer;
+				wsprintf(comp.unit, L"%ddB", comp.compval);
+			}
+			if (strcmp(cmd.command, "nano") == 0) {
+				comp.comptype = NANO;
+				comp.setrenderingcoords((gridstep / 2)+(gridstep/4), (gridstep / 2), 17.2, 7.2);
+				comp.compimg = nano;
+				wsprintf(comp.unit, L"Nano");
+			}
 		}
 		comp.rendercomponent(hdc);
 	}
@@ -289,7 +313,7 @@ std::vector<struct instruct> *emptystack(std::vector<struct instruct> *stack) {
 }
 
 int renderboard(const char* boardfile, int mode) {
-	struct instruct temp;
+	struct instruct temp; 
 	int index = 0, params[4];
 	char* returnchar;
 	char content[32];

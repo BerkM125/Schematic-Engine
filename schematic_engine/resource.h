@@ -20,10 +20,12 @@
 #define IDB_SWITCH                      115
 #define IDB_INDUCTOR                    116
 #define IDB_ARDMEGA                     117
-#define IDB_ULTRASONIC					118
-#define IDB_INFRARED					119
-#define IDB_NRF							120
-#define IDB_SERVO						121
+#define IDB_ULTRASONIC                  118
+#define IDB_INFRARED                    119
+#define IDB_NRF                         120
+#define IDB_SERVO                       121
+#define IDB_MICRO                       122
+#define IDB_BUZZER                      123
 #define IDR_MAINFRAME                   128
 #define IDC_BUTTON2                     1001
 #define IDC_BUTTON3                     1002
@@ -41,6 +43,10 @@
 #define IDC_BUTTON11                    1018
 #define IDC_BUTTON12                    1019
 #define IDC_BUTTON13                    1020
+#define IDC_BUTTON14                    1021
+#define IDC_BUTTON15                    1022
+#define IDC_BUTTON16                    1023
+#define IDC_BUTTON17                    1024
 #define ID_FILE_SAVE                    32771
 #define ID_FILE_OPEN                    32772
 #define ID_ZOOM_25                      32773

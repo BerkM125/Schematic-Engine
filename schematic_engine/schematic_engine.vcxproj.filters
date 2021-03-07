@@ -90,5 +90,14 @@
     <Image Include="nrfhz.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="buzzer.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="micro.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="servo.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

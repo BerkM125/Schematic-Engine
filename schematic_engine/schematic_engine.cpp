@@ -333,6 +333,9 @@ INT_PTR CALLBACK ComponentDialog(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
         SendDlgItemMessage(hDlg, IDC_BUTTON11, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)LoadBitmap(hInst, MAKEINTRESOURCE(IDB_INFRARED)));
         SendDlgItemMessage(hDlg, IDC_BUTTON12, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)LoadBitmap(hInst, MAKEINTRESOURCE(IDB_NRF)));
         SendDlgItemMessage(hDlg, IDC_BUTTON13, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)LoadBitmap(hInst, MAKEINTRESOURCE(IDB_SERVO)));
+        SendDlgItemMessage(hDlg, IDC_BUTTON14, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)LoadBitmap(hInst, MAKEINTRESOURCE(IDB_MICRO)));
+        SendDlgItemMessage(hDlg, IDC_BUTTON15, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BUZZER)));
+
         return (INT_PTR)TRUE;
 
     case WM_COMMAND:
@@ -385,6 +388,15 @@ INT_PTR CALLBACK ComponentDialog(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
                 break;
             case IDC_BUTTON13:
                 selectedcomponent = SERVO;
+                break;
+            case IDC_BUTTON14:
+                selectedcomponent = MICRO;
+                break;
+            case IDC_BUTTON15:
+                selectedcomponent = BUZZER;
+                break;
+            case IDC_BUTTON16:
+                selectedcomponent = NANO;
                 break;
         }
         break;

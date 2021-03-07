@@ -25,6 +25,11 @@
 #define INFRARED 12
 #define NRF 14
 #define SERVO 15
+#define MICRO 16
+#define BUZZER 17
+#define NANO 18
+#define XTOLERANCE 5
+#define YTOLERANCE 5
 
 struct instruct {
 	char command[32];

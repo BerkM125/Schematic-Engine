@@ -155,6 +155,7 @@
     <ResourceCompile Include="schematic_engine.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="buzzer.bmp" />
     <Image Include="capacitorhz.bmp" />
     <Image Include="dcmotorhz.bmp" />
     <Image Include="horizontalresistor.bmp" />
@@ -162,8 +163,10 @@
     <Image Include="inductor.bmp" />
     <Image Include="infraredhz.bmp" />
     <Image Include="mega2560.bmp" />
+    <Image Include="micro.bmp" />
     <Image Include="nrfhz.bmp" />
     <Image Include="schematic_engine.ico" />
+    <Image Include="servo.bmp" />
     <Image Include="small.ico" />
     <Image Include="switch.bmp" />
     <Image Include="ultrasonichz.bmp" />
