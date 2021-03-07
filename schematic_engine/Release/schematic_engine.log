@@ -1,0 +1,42 @@
+﻿  
+schematic_engine.rc(43): error RC2135: file not found: horizontalresistor.bmp
+  
+  
+schematic_engine.rc(45): error RC2135: file not found: capacitorhz.bmp
+  
+  
+schematic_engine.rc(47): error RC2135: file not found: dcmotorhz.bmp
+  
+  
+schematic_engine.rc(49): error RC2135: file not found: wireicon.bmp
+  
+  
+schematic_engine.rc(51): error RC2135: file not found: hzled.bmp
+  
+  
+schematic_engine.rc(53): error RC2135: file not found: switch.bmp
+  
+  
+schematic_engine.rc(55): error RC2135: file not found: inductor.bmp
+  
+  
+schematic_engine.rc(57): error RC2135: file not found: mega2560.bmp
+  
+  
+schematic_engine.rc(59): error RC2135: file not found: ultrasonichz.bmp
+  
+  
+schematic_engine.rc(61): error RC2135: file not found: infraredhz.bmp
+  
+  
+schematic_engine.rc(63): error RC2135: file not found: nrfhz.bmp
+  
+  
+schematic_engine.rc(65): error RC2135: file not found: servo.bmp
+  
+  
+schematic_engine.rc(67): error RC2135: file not found: micro.bmp
+  
+  
+schematic_engine.rc(69): error RC2135: file not found: buzzer.bmp
+  
