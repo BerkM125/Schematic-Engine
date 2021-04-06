@@ -197,10 +197,9 @@ void INITDBLBUFFER(HDC hdc) {
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    static int callbacks = 0;
     PAINTSTRUCT ps;
     int index = 0;
-    RECT* windowrect{};
-    GetWindowRect(hWnd, windowrect);
     switch (message) {
     case WM_LBUTTONDOWN:
         mouselbutton(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
@@ -226,6 +225,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
+            RECT* windowrect = {};
+            GetWindowRect(hWnd, windowrect);
             switch (wmId)
             {
                 case IDM_ABOUT:
@@ -259,6 +260,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                         index++;
                     }
                     saveboard(savefn);
+                    free(savefn);
                 }
                 break;
                 case ID_ZOOM_25:
@@ -296,13 +298,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 default:
                     return DefWindowProc(hWnd, message, wParam, lParam);
             }
+            free(windowrect);
         }
         break;
     case WM_PAINT:
         {
             hdc = BeginPaint(hWnd, &ps);
-            INITDBLBUFFER(hdc);
-            MainRender(hdc);
+            if (callbacks == 0) {
+                INITDBLBUFFER(hdc);
+                MainRender(hdc);
+ 
+            }
+            
             EndPaint(hWnd, &ps);
         }
         break;
@@ -312,6 +319,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
+    
     return 0;
 }
 

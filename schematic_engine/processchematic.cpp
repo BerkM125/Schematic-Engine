@@ -64,7 +64,23 @@ void configurepensettings(Graphics *graph, Pen *mainpen, Pen *negativepen, Pen *
 	negativepen->SetEndCap(LineCapRound);
 	positivepen->SetStartCap(LineCapRound);
 	positivepen->SetEndCap(LineCapRound);
-	{
+	return;
+}
+
+void component::rendercomponent(HDC hdc) {
+	static int configurationstate = 0;
+	Graphics graph(memdc);
+	Pen mainpen(Color(200, 128, 128, 128), (REAL)(gridstep / 3));
+	Pen negativepen(Color(200, 27, 155, 224), (REAL)(gridstep / 3));
+	Pen positivepen(Color(200, 224, 27, 27), (REAL)(gridstep / 3));
+	FontFamily  fontFamily(L"Calibri");
+	Font        font(&fontFamily, gridstep, FontStyleRegular, UnitPixel);
+	SolidBrush  solidBrush(Color(255, 0, 0, 255));
+	WCHAR       positivestr[] = L"+ VCC";
+	WCHAR       negativestr[] = L"⏚ GND";
+	configurepensettings(&graph, &mainpen, &negativepen, &positivepen);
+	//Set enumerator modes for GDI pens and context
+	if (configurationstate == 0) {
 		resistorhz = Image::FromFile(L"horizontalres.png");
 		dcmotorhz = Image::FromFile(L"dcmotorhz.png");
 		capacitorhz = Image::FromFile(L"capacitorhz.png");
@@ -80,23 +96,7 @@ void configurepensettings(Graphics *graph, Pen *mainpen, Pen *negativepen, Pen *
 		buzzer = Image::FromFile(L"buzzer.PNG");
 		nano = Image::FromFile(L"nano.PNG");
 	}
-	return;
-}
-
-void component::rendercomponent(HDC hdc) {
-	Graphics graph(memdc);
-	Pen mainpen(Color(200, 128, 128, 128), (REAL)(gridstep / 3));
-	Pen negativepen(Color(200, 27, 155, 224), (REAL)(gridstep / 3));
-	Pen positivepen(Color(200, 224, 27, 27), (REAL)(gridstep / 3));
-	FontFamily  fontFamily(L"Calibri");
-	Font        font(&fontFamily, gridstep, FontStyleRegular, UnitPixel);
-	SolidBrush  solidBrush(Color(255, 0, 0, 255));
-	WCHAR       positivestr[] = L"+ VCC";
-	WCHAR       negativestr[] = L"⏚ GND";
-
-
-	//Set enumerator modes for GDI pens and context 
-	configurepensettings(&graph, &mainpen, &negativepen, &positivepen);
+	configurationstate += 1;
 	//Calculate coordinates according to circuit pin grid
 	int px, py, nx, ny;
 	px = (positivexcoord * gridstep) + (gridstep/2);
@@ -379,5 +379,7 @@ VOID MainRender(HDC hdc) {
 	fclose(fp);
 	pushbuffer(hdc);
 	invokestate = true;
+	maingraphics.Flush();
+
 	return;
 }

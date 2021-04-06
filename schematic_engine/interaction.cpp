@@ -130,6 +130,7 @@ void mouselbutton(int x, int y) {
 					temp.params[2] = 1;
 			}
 			pushcomponent(temp, selectedcomponent, fx, fy, gx, gy);
+			OutputDebugStringW(L"PUSHED");
 			buttondownstate = 0;
 			selectedcomponent = UNDEFCOMP;
 		}

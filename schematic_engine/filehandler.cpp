@@ -15,14 +15,14 @@ void checkfile(void) {
 	FILE* fp;
 	char cmd[32];
 	static int state = 0;
-	RECT* windowrect{};
-	GetWindowRect(hWnd, windowrect);
 	fp = fopen("slotfile.txt", "r+");
 	fgets(cmd, 16, fp);
 	if (strcmp(currentcommand, cmd) != 0 && getlen(cmd) >= 12) {
+		RECT windowrect;
+		GetWindowRect(hWnd, &windowrect);
 		strcpy(currentcommand, cmd);
 		renderboard("slotfile.txt", 0);
-		RedrawWindow(hWnd, windowrect, NULL, RDW_ERASE | RDW_INVALIDATE);
+		RedrawWindow(hWnd, &windowrect, NULL, RDW_ERASE | RDW_INVALIDATE);
 		state++;
 	}
 	fclose(fp);
