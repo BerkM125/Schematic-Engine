@@ -260,7 +260,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                         index++;
                     }
                     saveboard(savefn);
-                    free(savefn);
                 }
                 break;
                 case ID_ZOOM_25:

@@ -79,7 +79,6 @@ void component::rendercomponent(HDC hdc) {
 	WCHAR       positivestr[] = L"+ VCC";
 	WCHAR       negativestr[] = L"⏚ GND";
 	configurepensettings(&graph, &mainpen, &negativepen, &positivepen);
-	//Set enumerator modes for GDI pens and context
 	if (configurationstate == 0) {
 		resistorhz = Image::FromFile(L"horizontalres.png");
 		dcmotorhz = Image::FromFile(L"dcmotorhz.png");
@@ -191,6 +190,7 @@ void rendergrid(HDC hdc) {
 }
 
 void processcommand(struct instruct cmd) {
+	hdc = GetDC(hWnd);
 	component comp;
 	if (strcmp(cmd.command, "wire") == 0) {
 		comp.setcoords(cmd.params[0], cmd.params[1], POSITIVE);

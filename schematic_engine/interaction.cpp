@@ -8,8 +8,10 @@ using namespace Gdiplus;
 
 int dragx1 = UNDEFCOORD, dragy1 = UNDEFCOORD, dragx2 = UNDEFCOORD, dragy2 = UNDEFCOORD;
 int oldx1 = UNDEFCOORD, oldy1 = UNDEFCOORD;
-
+bool mousedragging = false;
 void mouseup(int x, int y) {
+	if (!mousedragging)
+		return;
 	hdc = GetDC(hWnd);
 	Graphics maingraph(memdc);
 	int i;
@@ -17,8 +19,7 @@ void mouseup(int x, int y) {
 	bool matchingcomp = false;
 	dragx2 = x / gridstep;
 	dragy2 = y / gridstep;
-	sprintf(string, "\0");
-	sprintf(string, "%d %d %d %d", oldx1, oldy1, dragx2, dragy2);
+	//Using coordinates, check to see if there is a component that exists when finishing dragging maneuver
 	if (dragx1 != UNDEFCOORD && dragy1 != UNDEFCOORD) {
 		for (i = 0; i < line.size(); i++) {
 			if (oldx1 >= line[i].params[0] && oldx1 <= line[i].params[0]+XTOLERANCE && oldy1 >= line[i].params[1] && oldy1 <= line[i].params[1]+YTOLERANCE && strcmp(line[i].command, "wire") != 0) {
@@ -28,6 +29,7 @@ void mouseup(int x, int y) {
 		}
 	}
 	else return;
+	//Now if there was a matching component, the index, i, is the index of the component in the vector of electronic components, and thus we can use that
 	if (matchingcomp == true && dragx2 != UNDEFCOORD && dragy2 != UNDEFCOORD) {
 		int dx, dy;
 		dx = line[i].params[2] - line[i].params[0];
@@ -41,6 +43,7 @@ void mouseup(int x, int y) {
 	pushbuffer(hdc);
 	ReleaseDC(hWnd, hdc);
 	maingraph.Flush();
+	mousedragging = false;
 }
 
 void mouselmove (int x, int y) {
@@ -50,6 +53,7 @@ void mouselmove (int x, int y) {
 	Pen mainpen(Color(255, 0, 72), 2.0F);
 	int amnt = gridstep;
 	static int gx = UNDEFCOORD, gy = UNDEFCOORD;
+	mousedragging = true;
 	if (gx != UNDEFCOORD && gy != UNDEFCOORD) {
 		Rect oldrect((gx * gridstep) + amnt, (gy * gridstep) + amnt, amnt, amnt);
 		maingraph.DrawRectangle(&whitepen, oldrect);
