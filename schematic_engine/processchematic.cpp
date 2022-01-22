@@ -11,9 +11,11 @@
 #include "schem.h"
 using namespace Gdiplus;
 #pragma comment (lib,"gdiplus.lib")
+
 FILE* fp;
 int gridstep = 20;
 int currentstate = 0;
+
 Image* resistorhz;
 Image* dcmotorhz;
 Image* capacitorhz;
@@ -25,37 +27,14 @@ Image* ultrasonichz;
 Image* infraredhz;
 Image* nrfhz;
 Image* servo;
-Image* micro; 
+Image* micro;
 Image* buzzer;
 Image* nano;
+
 std::vector<struct instruct> line;
 bool invokestate = false;
 
-class component {
-	public:
-		int comptype;
-		int compval;
-		int orientation;
-		wchar_t unit[16];
-		Image* compimg;
-		void rendercomponent(HDC hdc);
-		void setcoords(int x, int y, int pole);
-		void setcompvalue(int ori, int val);
-		void setrenderingcoords(float x1, float y1, float x2, float y2);
-		component(int ctype = EMPTYCOMP, int posxcoord = 0, int posycoord = 0, int negxcoord = 0, int negycoord = 0);
-	private:
-		int positivexcoord;
-		int positiveycoord;
-		int negativexcoord;
-		int negativeycoord;
-		float pxdiff1;
-		float pxdiff2;
-		float pydiff1;
-		float pydiff2;
-
-};
-
-void configurepensettings(Graphics *graph, Pen *mainpen, Pen *negativepen, Pen *positivepen) {
+void configurepensettings(Graphics* graph, Pen* mainpen, Pen* negativepen, Pen* positivepen) {
 	graph->SetSmoothingMode(SmoothingModeAntiAlias);
 	graph->SetTextRenderingHint(TextRenderingHintAntiAlias);
 	mainpen->SetStartCap(LineCapRound);
@@ -98,34 +77,38 @@ void component::rendercomponent(HDC hdc) {
 	configurationstate += 1;
 	//Calculate coordinates according to circuit pin grid
 	int px, py, nx, ny;
-	px = (positivexcoord * gridstep) + (gridstep/2);
+	px = (positivexcoord * gridstep) + (gridstep / 2);
 	py = (positiveycoord * gridstep) + (gridstep / 2);
 	nx = (negativexcoord * gridstep) + (gridstep / 2);
 	ny = (negativeycoord * gridstep) + (gridstep / 2);
 	switch (comptype) {
-		case WIRECOMP:
-			if ((positiveycoord * gridstep) == 0 || (negativeycoord * gridstep) == 0) {
-				graph.DrawLine(&negativepen, px, py, nx, ny);
-				graph.DrawString(negativestr, -1, &font, PointF(px + (nx - px), (ny - py) / 2), &solidBrush);
-			}
-			else if ((positiveycoord * gridstep) == gridstep || (negativeycoord * gridstep) == gridstep) {
-				graph.DrawLine(&positivepen, px, py, nx, ny);
-				graph.DrawString(positivestr, -1, &font, PointF(px + (nx - px), ((ny - py) / 2)-gridstep), &solidBrush);
-			}
-			else
-				graph.DrawLine(&mainpen, px, py, nx, ny);
-			break;
-		default:
-			if (orientation == 1) {
-				graph.DrawImage(compimg, px - pxdiff1, py - pydiff1, gridstep * pxdiff2, gridstep * pydiff2);
-				graph.DrawString(unit, -1, &font, PointF(px + gridstep * 1.2, py + gridstep * 1.7), &solidBrush);
-			}
-			else if (orientation == 0) {
-				compimg->RotateFlip(Rotate90FlipXY);
-				graph.DrawImage(compimg, px - pydiff1, py - pxdiff1, gridstep * pydiff2, gridstep * pxdiff2);
-				graph.DrawString(unit, -1, &font, PointF(px + gridstep * 1.2, py + gridstep * 1.7), &solidBrush);
-			}
-			break;
+	case WIRECOMP:
+		if ((positiveycoord * gridstep) == 0 || (negativeycoord * gridstep) == 0) {
+			graph.DrawLine(&negativepen, px, py, nx, ny);
+			graph.DrawString(negativestr, -1, &font, PointF(px + (nx - px), (ny - py) / 2), &solidBrush);
+		}
+		else if ((positiveycoord * gridstep) == gridstep || (negativeycoord * gridstep) == gridstep) {
+			graph.DrawLine(&positivepen, px, py, nx, ny);
+			graph.DrawString(positivestr, -1, &font, PointF(px + (nx - px), ((ny - py) / 2) - gridstep), &solidBrush);
+		}
+		else
+			graph.DrawLine(&mainpen, px, py, nx, ny);
+		break;
+	default:
+		if (orientation == 1) {
+			graph.DrawImage(compimg, px - pxdiff1, py - pydiff1, gridstep * pxdiff2, gridstep * pydiff2);
+			graph.DrawString(unit, -1, &font, PointF(px + gridstep * 1.2, py + gridstep * 1.7), &solidBrush);
+		}
+		else if (orientation == 0) {
+			//Removed vertical alignment rotation for now due to a few issues in refreshing and updating
+			/*compimg->RotateFlip(Rotate90FlipXY);
+			graph.DrawImage(compimg, px - pydiff1, py - pxdiff1, gridstep * pydiff2, gridstep * pxdiff2);
+			graph.DrawString(unit, -1, &font, PointF(px + gridstep * 1.2, py + gridstep * 1.7), &solidBrush);*/
+			//Stick to horizontal alignment for now
+			graph.DrawImage(compimg, px - pxdiff1, py - pydiff1, gridstep * pxdiff2, gridstep * pydiff2);
+			graph.DrawString(unit, -1, &font, PointF(px + gridstep * 1.2, py + gridstep * 1.7), &solidBrush);
+		}
+		break;
 	}
 	pushbuffer(hdc);
 	return;
@@ -155,12 +138,23 @@ void component::setrenderingcoords(float x1, float y1, float x2, float y2) {
 	pydiff2 = y2;
 }
 
-component::component(int ctype, int posxcoord, int posycoord, int negxcoord, int negycoord) {
+/*component::component(int ctype, int posxcoord, int posycoord, int negxcoord, int negycoord) {
 	comptype = ctype;
 	positivexcoord = posxcoord;
 	positiveycoord = posycoord;
 	negativexcoord = negxcoord;
 	negativeycoord = negycoord;
+}*/
+
+component::component(int ctype, float renderx1, float rendery1, float renderx2, float rendery2,
+	Image* cimg, const wchar_t* unitval) {
+	comptype = ctype;
+	compimg = cimg;
+	pxdiff1 = renderx1;
+	pxdiff2 = renderx2;
+	pydiff1 = rendery1;
+	pydiff2 = rendery2;
+	wcsncpy(unit, unitval, 16);
 }
 
 void rendergrid(HDC hdc) {
@@ -169,125 +163,57 @@ void rendergrid(HDC hdc) {
 	RECT dimension;
 	Graphics maingraphics(memdc);
 	Pen mainpen(Color(128, 128, 128), (REAL)0.2F);
-	Pen negativepen(Color(255, 27, 155, 224), (REAL)(gridstep/3));
-	Pen positivepen(Color(255, 224, 27, 27), (REAL)(gridstep/3));
+	Pen negativepen(Color(255, 27, 155, 224), (REAL)(gridstep / 3));
+	Pen positivepen(Color(255, 224, 27, 27), (REAL)(gridstep / 3));
 	GetWindowRect(hWnd, &dimension);
 	width = dimension.right - dimension.left;
 	height = dimension.bottom - dimension.top - 62;
-	
-	for (x = 0; x < width; x+=gridstep) {
+
+	for (x = 0; x < width; x += gridstep) {
 		maingraphics.DrawLine(&mainpen, x, 0, x, height);
 	}
-	for (y = 0; y < height; y+=gridstep) {
+	for (y = 0; y < height; y += gridstep) {
 		maingraphics.DrawLine(&mainpen, 0, y, width, y);
 	}
-	maingraphics.DrawLine(&negativepen, 0, gridstep/2, width, gridstep/2);
-	maingraphics.DrawLine(&positivepen, 0, (gridstep/2)+gridstep, width, (gridstep / 2) +gridstep);
+	maingraphics.DrawLine(&negativepen, 0, gridstep / 2, width, gridstep / 2);
+	maingraphics.DrawLine(&positivepen, 0, (gridstep / 2) + gridstep, width, (gridstep / 2) + gridstep);
 	maingraphics.DrawLine(&positivepen, 0, height, width, height);
 	maingraphics.DrawLine(&negativepen, 0, height - gridstep, width, height - gridstep);
 	pushbuffer(hdc);
 	return;
 }
 
-void processcommand(struct instruct cmd) {
+void processcommand(struct instruct cmd, unsigned int ptype) {
+	//Depending on ptype, function will check for either string field or integer field for the component
 	hdc = GetDC(hWnd);
 	component comp;
-	if (strcmp(cmd.command, "wire") == 0) {
+	if (strcmp(cmd.command, "wire") == 0 || cmd.compmacro == WIRECOMP) {
 		comp.setcoords(cmd.params[0], cmd.params[1], POSITIVE);
 		comp.setcoords(cmd.params[2], cmd.params[3], NEGATIVE);
 		comp.comptype = WIRECOMP;
 		comp.rendercomponent(hdc);
 	}
 	else {
-		comp.setcoords(cmd.params[0], cmd.params[1], POSITIVE);
-		comp.setcoords(cmd.params[0] + gridstep * 3, cmd.params[1] + gridstep * 3, NEGATIVE);
-		comp.setcompvalue(cmd.params[2], cmd.params[3]); 
-		{
-			if (strcmp(cmd.command, "dcmotor") == 0) {
-				comp.comptype = DCMOTOR;
-				comp.setrenderingcoords((gridstep / 2), (gridstep * 1.5), 5, 4);
-				comp.compimg = dcmotorhz;
-				wsprintf(comp.unit, L"%dτ", comp.compval);
-			}
-			if (strcmp(cmd.command, "capacitor") == 0) {
-				comp.comptype = CAPACITOR;
-				comp.setrenderingcoords((gridstep / 8), gridstep, 4, 2);
-				comp.compimg = capacitorhz;
-				wsprintf(comp.unit, L"%dμ", comp.compval);
-			}
-			if (strcmp(cmd.command, "resistor") == 0) {
-				comp.comptype = RESISTOR;
-				comp.setrenderingcoords(0, (gridstep / 2), 4, 1);
-				comp.compimg = resistorhz;
-				wsprintf(comp.unit, L"%dΩ", comp.compval);
-			}
-			if (strcmp(cmd.command, "switch") == 0) {
-				comp.comptype = SWITCHCOMP;
-				comp.setrenderingcoords((gridstep / 8), gridstep, 5.5, 1.7);
-				comp.compimg = switchhz;
-				wsprintf(comp.unit, L"0 | 1");
-			}
-			if (strcmp(cmd.command, "led") == 0) {
-				comp.comptype = LEDLIGHT;
-				comp.setrenderingcoords((gridstep / 8), (gridstep * 2.1), 4, 3);
-				comp.compimg = ledhz;
-				wsprintf(comp.unit, L"%dLum", comp.compval);
-			}
-			if (strcmp(cmd.command, "inductor") == 0) {
-				comp.comptype = INDUCTOR;
-				comp.setrenderingcoords((gridstep / 8), gridstep, 5.5, 2.1);
-				comp.compimg = inductorhz;
-				wsprintf(comp.unit, L"EMF");
-			}
-			if (strcmp(cmd.command, "mega") == 0) {
-				comp.comptype = MEGA;
-				comp.setrenderingcoords((gridstep / 8), 0, 40, 20);
-				comp.compimg = megahz;
-				wsprintf(comp.unit, L"ATmega2560");
-			}
-			if (strcmp(cmd.command, "ultrasonic") == 0) {
-				comp.comptype = ULTRASONIC;
-				comp.setrenderingcoords((gridstep / 2), (gridstep / 2), 16, 11);
-				comp.compimg = ultrasonichz;
-				wsprintf(comp.unit, L"%dkHz", comp.compval);
-			}
-			if (strcmp(cmd.command, "infrared") == 0) {
-				comp.comptype = INFRARED;
-				comp.setrenderingcoords((gridstep / 2), (gridstep / 2), 5, 8);
-				comp.compimg = infraredhz;
-				wsprintf(comp.unit, L"%dkHz", comp.compval);
-			}
-			if (strcmp(cmd.command, "nrf") == 0) {
-				comp.comptype = NRF;
-				comp.setrenderingcoords((gridstep / 2), (gridstep / 2), 6, 11);
-				comp.compimg = nrfhz;
-				wsprintf(comp.unit, L"%dGHz", comp.compval);
-			}
-			if (strcmp(cmd.command, "servo") == 0) {
-				comp.comptype = SERVO;
-				comp.setrenderingcoords((gridstep / 2), (gridstep / 2), 10.8, 9.6);
-				comp.compimg = servo;
-				wsprintf(comp.unit, L"%dkg/cm", comp.compval);
-			}
-			if (strcmp(cmd.command, "micro") == 0) {
-				comp.comptype = MICRO;
-				comp.setrenderingcoords((gridstep / 2), (gridstep / 2), 20, 7.2);
-				comp.compimg = micro;
-				wsprintf(comp.unit, L"32u4");
-			}
-			if (strcmp(cmd.command, "buzzer") == 0) {
-				comp.comptype = BUZZER;
-				comp.setrenderingcoords((gridstep / 2), (gridstep / 2), 7, 4.8);
-				comp.compimg = buzzer;
-				wsprintf(comp.unit, L"%ddB", comp.compval);
-			}
-			if (strcmp(cmd.command, "nano") == 0) {
-				comp.comptype = NANO;
-				comp.setrenderingcoords((gridstep / 2)+(gridstep/4), (gridstep / 2), 17.2, 7.2);
-				comp.compimg = nano;
-				wsprintf(comp.unit, L"Nano");
+		switch (ptype) {
+		//In this case, file loading won't set the integer component field by itself,
+		//meaning we must fall back onto the string field
+		case PROCESS_FILETYPE:
+			comp = componentmap[commandmap[cmd.command]];
+			break;
+		//Objects from a list/stack are guaranteed to have a valid integer component field
+		case PROCESS_STACKTYPE: 
+			{
+				wchar_t tempstr[16];
+				comp = componentmap[cmd.compmacro];
+				//Might make label value a constructor field later
+				comp.setcompvalue(cmd.params[2], cmd.params[3]);
+				wsprintf(tempstr, comp.unit, comp.compval);
+				wcsncpy(comp.unit, tempstr, 16);
+				break;
 			}
 		}
+		comp.setcoords(cmd.params[0], cmd.params[1], POSITIVE);
+		comp.setcoords(cmd.params[0] + gridstep * 3, cmd.params[1] + gridstep * 3, NEGATIVE);
 		comp.rendercomponent(hdc);
 	}
 }
@@ -297,14 +223,16 @@ void saveboard(const char* fn) {
 	if (fp == NULL)
 		return;
 	for (int i = 0; i < line.size(); i++) {
-		fprintf(fp, "%s %d %d %d %d\n", line[i].command, line[i].params[0], line[i].params[1], line[i].params[2], line[i].params[3]);
+		fprintf(fp, "%s %d %d %d %d\n", line[i].command, line[i].params[0], 
+			line[i].params[1], line[i].params[2], line[i].params[3]);
 	}
+	//Indicate end of the list
 	fprintf(fp, "END 0 0 0 0");
 	fclose(fp);
 	return;
 }
 
-std::vector<struct instruct> *emptystack(std::vector<struct instruct> *stack) {
+std::vector<struct instruct>* emptystack(std::vector<struct instruct>* stack) {
 	int sz = stack->size();
 	int index = 0;
 	stack->clear();
@@ -313,12 +241,15 @@ std::vector<struct instruct> *emptystack(std::vector<struct instruct> *stack) {
 }
 
 int renderboard(const char* boardfile, int mode) {
-	struct instruct temp; 
+	struct instruct temp;
 	int index = 0, params[4];
 	char* returnchar;
 	char content[32];
+	
+	//Mode 0 indicates a file load, meaning the list must be loaded
+	//first and then processed via processcommand()
 	if (mode == 0) {
-		if(strcmp(boardfile, "slotfile.txt") != 0)
+		if (strcmp(boardfile, "slotfile.txt") != 0)
 			emptystack(&line);
 		fp = fopen(boardfile, "r+");
 		if (fp == NULL)
@@ -335,15 +266,18 @@ int renderboard(const char* boardfile, int mode) {
 			index++;
 		}
 		for (int i = 0; i < index; i++)
-			processcommand(line[i]);
+			processcommand(line[i], PROCESS_FILETYPE);
 		fclose(fp);
 	}
+	//Mode 1 indicates a loaded stack, in this mode the program 
+	//simply iterates and renders based on stored data in the list
 	else
 		for (int i = 0; i < line.size(); i++)
-			processcommand(line[i]);
+			processcommand(line[i], PROCESS_STACKTYPE);
 	return (0);
 }
 
+//Push all stored drawing on dual memory buffer onto display
 void pushbuffer(HDC hdc) {
 	INT width, height;
 	RECT dimension;
@@ -359,6 +293,7 @@ VOID MainRender(HDC hdc) {
 	RECT dimension;
 	Graphics maingraphics(memdc);
 
+	//Set general graphics styles, preferential
 	maingraphics.SetCompositingMode(CompositingModeSourceCopy);
 	maingraphics.SetCompositingQuality(CompositingQualityHighSpeed);
 	maingraphics.SetPixelOffsetMode(PixelOffsetModeNone);
@@ -369,6 +304,7 @@ VOID MainRender(HDC hdc) {
 	height = dimension.bottom - dimension.top;
 	maingraphics.Clear(Color(255, 255, 255));
 	maingraphics.SetSmoothingMode(SmoothingModeNone);
+
 	rendergrid(memdc);
 	if (invokestate == false)
 		renderboard(boardfn, 0);
@@ -377,6 +313,7 @@ VOID MainRender(HDC hdc) {
 	fp = fopen("slotfile.txt", "r+");
 	fgets(currentcommand, 16, fp);
 	fclose(fp);
+
 	pushbuffer(hdc);
 	invokestate = true;
 	maingraphics.Flush();

@@ -38,10 +38,13 @@
     <ClCompile Include="processchematic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="interaction.cpp">
+    <ClCompile Include="eventhandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="filehandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="parametricmapping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -97,6 +100,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="servo.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Release\shematiclogo.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

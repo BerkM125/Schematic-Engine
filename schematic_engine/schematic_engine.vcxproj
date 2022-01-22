@@ -147,7 +147,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="filehandler.cpp" />
-    <ClCompile Include="interaction.cpp" />
+    <ClCompile Include="eventhandler.cpp" />
+    <ClCompile Include="parametricmapping.cpp" />
     <ClCompile Include="processchematic.cpp" />
     <ClCompile Include="schematic_engine.cpp" />
   </ItemGroup>
@@ -165,6 +166,7 @@
     <Image Include="mega2560.bmp" />
     <Image Include="micro.bmp" />
     <Image Include="nrfhz.bmp" />
+    <Image Include="Release\shematiclogo.bmp" />
     <Image Include="schematic_engine.ico" />
     <Image Include="servo.bmp" />
     <Image Include="small.ico" />

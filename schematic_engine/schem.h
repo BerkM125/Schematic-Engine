@@ -1,9 +1,16 @@
 #pragma once
+#include <windows.h>
+#include <windowsx.h>
+#include <objidl.h>
+#include <gdiplus.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 #include <vector>
+#include <map>
 #include <thread>
+using namespace Gdiplus;
+#pragma comment (lib,"gdiplus.lib")
 #define UNDEFCOORD 99999
 #define UNDEFCOMP 99998
 #define POSITIVE 999
@@ -30,13 +37,86 @@
 #define NANO 18
 #define XTOLERANCE 5
 #define YTOLERANCE 5
+#define PROCESS_FILETYPE 1
+#define PROCESS_STACKTYPE 2
 
 struct instruct {
-	char command[32];
 	int params[4];
+	unsigned int compmacro;
+	char command[32];
 };
+
+class parameterstruct {
+public:
+	int unitparam;
+	char label[32];
+	parameterstruct(int up = 0, const char* lb = "") {
+		unitparam = up;
+		strcpy(label, lb);
+	}
+	parameterstruct(const parameterstruct& nv) {
+		unitparam = nv.unitparam;
+		strcpy(label, nv.label);
+	}
+};
+
+class component {
+public:
+	int comptype;
+	int compval;
+	int orientation;
+	wchar_t unit[16];
+	Image* compimg;
+	void rendercomponent(HDC hdc);
+	void setcoords(int x, int y, int pole);
+	void setcompvalue(int ori, int val);
+	void setrenderingcoords(float x1, float y1, float x2, float y2);
+	//component(int ctype = EMPTYCOMP, int posxcoord = 0, int posycoord = 0, int negxcoord = 0, int negycoord = 0);
+	component(int ctype = EMPTYCOMP, float renderx1 = 0, float rendery1 = 0, float renderx2 = 0, float rendery2 = 0, 
+		Image* cimg = NULL, const wchar_t* unitval = L"");
+	component(const component& nv) {
+		comptype = nv.comptype;
+		compval = nv.compval;
+		orientation = nv.orientation;
+		wcsncpy(unit, nv.unit, 16);
+		compimg = nv.compimg;
+		positivexcoord = nv.positivexcoord;
+		positiveycoord = nv.positiveycoord;
+		negativexcoord = nv.negativexcoord;
+		negativeycoord = nv.negativeycoord;
+		pxdiff1 = nv.pxdiff1;
+		pxdiff2 = nv.pxdiff2;
+		pydiff1 = nv.pydiff1;
+		pydiff2 = nv.pydiff2;
+	}
+private:
+	int positivexcoord;
+	int positiveycoord;
+	int negativexcoord;
+	int negativeycoord;
+	float pxdiff1;
+	float pxdiff2;
+	float pydiff1;
+	float pydiff2;
+}; 
+
+extern Image* resistorhz;
+extern Image* dcmotorhz;
+extern Image* capacitorhz;
+extern Image* ledhz;
+extern Image* switchhz;
+extern Image* inductorhz;
+extern Image* megahz;
+extern Image* ultrasonichz;
+extern Image* infraredhz;
+extern Image* nrfhz;
+extern Image* servo;
+extern Image* micro;
+extern Image* buzzer;
+extern Image* nano;
+
 extern char currentcommand[32];
-extern LPWSTR *cmdtext;
+extern LPWSTR* cmdtext;
 extern int globalluminosity;
 extern int globalres;
 extern int globalcapacity;
@@ -50,6 +130,9 @@ extern HDC hdc;
 extern HDC memdc;
 extern char boardfn[64];
 extern std::vector<struct instruct> line;
+extern std::map<int, parameterstruct> parametermap;
+extern std::map<int, component> componentmap;
+extern std::map<std::string, int> commandmap;
 extern void checkfile(void);
 extern void pushcomponent(struct instruct temp, int selectedcomponent, int fx, int fy, int gx, int gy);
 extern VOID MainRender(HDC hdc);
@@ -62,3 +145,5 @@ extern void mousermove(int x, int y);
 extern void mouselbutton(int x, int y);
 extern void saveboard(const char* fn);
 extern void pushbuffer(HDC hdc);
+extern void initparametermapping(void);
+extern void initcomponentmapping(void);

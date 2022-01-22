@@ -58,6 +58,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SCHEMATICENGINE));
     CreateDialog(hInst, MAKEINTRESOURCE(IDD_DIALOGBAR), hWnd, ComponentDialog);
     MSG msg;
+    initparametermapping();
+    initcomponentmapping();
     while (GetMessage(&msg, nullptr, 0, 0))
     {
         if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
@@ -200,7 +202,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     static int callbacks = 0;
     PAINTSTRUCT ps;
     int index = 0;
+    char msg[32];
     switch (message) {
+    case WM_KEYDOWN:
+        sprintf(msg, "WM_KEYDOWN: 0x%x\n", wParam);
+        OutputDebugStringA(msg);
+        break;
     case WM_LBUTTONDOWN:
         mouselbutton(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
