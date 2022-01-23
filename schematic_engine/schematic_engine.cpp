@@ -62,6 +62,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     initcomponentmapping();
     while (GetMessage(&msg, nullptr, 0, 0))
     {
+        SetCursor(LoadCursor(NULL, IDC_CROSS));
         if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
         {
             TranslateMessage(&msg);
@@ -208,13 +209,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         sprintf(msg, "WM_KEYDOWN: 0x%x\n", wParam);
         OutputDebugStringA(msg);
         break;
+    case WM_RBUTTONDOWN:
+        //undoaction();
+        mouserbutton(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        break;
     case WM_LBUTTONDOWN:
         mouselbutton(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        //pushdata(line);
         break;
     case WM_LBUTTONUP:
         mouseup(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        
         break;
     case WM_MOUSEMOVE:
+        
         if (wParam & MK_LBUTTON) {
             mouselmove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         }
@@ -253,6 +261,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                             boardfn[index] = '/';
                         index++;
                     }
+                    //MainRender(hdc);
                     RedrawWindow(hWnd, windowrect, NULL, RDW_ERASE | RDW_INVALIDATE);
                     break;
                 case ID_FILE_SAVE:
@@ -313,7 +322,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (callbacks == 0) {
                 INITDBLBUFFER(hdc);
                 MainRender(hdc);
- 
             }
             
             EndPaint(hWnd, &ps);
@@ -349,7 +357,10 @@ INT_PTR CALLBACK ComponentDialog(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
         SendDlgItemMessage(hDlg, IDC_BUTTON13, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)LoadBitmap(hInst, MAKEINTRESOURCE(IDB_SERVO)));
         SendDlgItemMessage(hDlg, IDC_BUTTON14, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)LoadBitmap(hInst, MAKEINTRESOURCE(IDB_MICRO)));
         SendDlgItemMessage(hDlg, IDC_BUTTON15, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BUZZER)));
-
+        SendDlgItemMessage(hDlg, IDC_BUTTON16, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)LoadBitmap(hInst, MAKEINTRESOURCE(IDB_NANO)));
+        SendDlgItemMessage(hDlg, IDC_BUTTON17, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)LoadBitmap(hInst, MAKEINTRESOURCE(IDB_DHT11)));
+        SendDlgItemMessage(hDlg, IDC_BUTTON18, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)LoadBitmap(hInst, MAKEINTRESOURCE(IDB_NODEMCU)));
+        SendDlgItemMessage(hDlg, IDC_BUTTON19, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)LoadBitmap(hInst, MAKEINTRESOURCE(IDB_GY521)));
         return (INT_PTR)TRUE;
 
     case WM_COMMAND:
@@ -411,6 +422,15 @@ INT_PTR CALLBACK ComponentDialog(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
                 break;
             case IDC_BUTTON16:
                 selectedcomponent = NANO;
+                break;
+            case IDC_BUTTON17:
+                selectedcomponent = DHT11;
+                break;
+            case IDC_BUTTON18:
+                selectedcomponent = NODEMCU;
+                break;
+            case IDC_BUTTON19:
+                selectedcomponent = ACCELEROMETER;
                 break;
         }
         break;

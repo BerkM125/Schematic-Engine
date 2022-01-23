@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+#include <stack>
 #include <vector>
 #include <map>
 #include <thread>
@@ -35,6 +36,9 @@ using namespace Gdiplus;
 #define MICRO 16
 #define BUZZER 17
 #define NANO 18
+#define DHT11 19
+#define NODEMCU 20
+#define ACCELEROMETER 21
 #define XTOLERANCE 5
 #define YTOLERANCE 5
 #define PROCESS_FILETYPE 1
@@ -67,7 +71,7 @@ public:
 	int orientation;
 	wchar_t unit[16];
 	Image* compimg;
-	void rendercomponent(HDC hdc);
+	void rendercomponent(void);
 	void setcoords(int x, int y, int pole);
 	void setcompvalue(int ori, int val);
 	void setrenderingcoords(float x1, float y1, float x2, float y2);
@@ -114,6 +118,9 @@ extern Image* servo;
 extern Image* micro;
 extern Image* buzzer;
 extern Image* nano;
+extern Image* dht11;
+extern Image* nodemcu;
+extern Image* accelerometer;
 
 extern char currentcommand[32];
 extern LPWSTR* cmdtext;
@@ -128,11 +135,15 @@ extern int gridstep;
 extern int selectedcomponent;
 extern HDC hdc;
 extern HDC memdc;
+extern HINSTANCE hInst;
+extern HCURSOR mcursor;
 extern char boardfn[64];
 extern std::vector<struct instruct> line;
 extern std::map<int, parameterstruct> parametermap;
 extern std::map<int, component> componentmap;
 extern std::map<std::string, int> commandmap;
+extern std::stack<std::vector<struct instruct>> undostk;
+extern std::stack<std::vector<struct instruct>> redostk;
 extern void checkfile(void);
 extern void pushcomponent(struct instruct temp, int selectedcomponent, int fx, int fy, int gx, int gy);
 extern VOID MainRender(HDC hdc);
@@ -143,7 +154,11 @@ extern void mousemove(int x, int y);
 extern void mouselmove(int x, int y);
 extern void mousermove(int x, int y);
 extern void mouselbutton(int x, int y);
+extern void mouserbutton(int x, int y);
 extern void saveboard(const char* fn);
 extern void pushbuffer(HDC hdc);
 extern void initparametermapping(void);
 extern void initcomponentmapping(void);
+extern void pushdata(std::vector<struct instruct> data);
+extern void undoaction(void);
+extern void redoaction(void);

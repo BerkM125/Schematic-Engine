@@ -26,6 +26,10 @@
 #define IDB_SERVO                       121
 #define IDB_MICRO                       122
 #define IDB_BUZZER                      123
+#define IDB_NANO						124
+#define IDB_DHT11						125
+#define IDB_GY521						126
+#define IDB_NODEMCU						127
 #define IDR_MAINFRAME                   128
 #define IDC_BUTTON2                     1001
 #define IDC_BUTTON3                     1002
@@ -47,6 +51,10 @@
 #define IDC_BUTTON15                    1022
 #define IDC_BUTTON16                    1023
 #define IDC_BUTTON17                    1024
+#define IDC_BUTTON18                    1025
+#define IDC_BUTTON19                    1026
+#define IDC_BUTTON20                    1027
+#define IDC_BUTTON21                    1028
 #define ID_FILE_SAVE                    32771
 #define ID_FILE_OPEN                    32772
 #define ID_ZOOM_25                      32773

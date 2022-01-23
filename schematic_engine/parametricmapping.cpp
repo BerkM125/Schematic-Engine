@@ -6,6 +6,7 @@
 #include "schem.h"
 using namespace Gdiplus;
 #pragma comment (lib,"gdiplus.lib")
+
 std::map<int, parameterstruct> parametermap;
 std::map<int, component> componentmap;
 std::map<std::string, int> commandmap;
@@ -26,6 +27,9 @@ void initparametermapping(void) {
 		parametermap[MICRO] = parameterstruct(32, "micro");
 		parametermap[BUZZER] = parameterstruct(125, "buzzer");
 		parametermap[NANO] = parameterstruct(125, "nano");
+		parametermap[DHT11] = parameterstruct(11, "dht11");
+		parametermap[NODEMCU] = parameterstruct(2.4, "nodemcu");
+		parametermap[ACCELEROMETER] = parameterstruct(521, "accelerometer");
 	}
 }
 
@@ -45,6 +49,9 @@ void initcomponentmapping(void) {
 		componentmap[MICRO] = component(MICRO, (gridstep / 2), (gridstep / 2), 20, 7.2, micro, L"32u4");
 		componentmap[BUZZER] = component(BUZZER, (gridstep / 2), (gridstep / 2), 7, 4.8, buzzer, L"%ddB");
 		componentmap[NANO] = component(NANO, (gridstep / 2) + (gridstep / 4), (gridstep / 2), 17.2, 7.2, nano, L"Nano");
+		componentmap[DHT11] = component(DHT11, (gridstep / 2) + (gridstep / 4), (gridstep / 2), 7, 11, dht11, L"DHT11");
+		componentmap[NODEMCU] = component(NODEMCU, (gridstep / 2), (gridstep / 2), 20, 10, nodemcu, L"NodeMCU");
+		componentmap[ACCELEROMETER] = component(ACCELEROMETER, (gridstep / 2), (gridstep / 2), 6, 8, accelerometer, L"GY_521");
 
 		commandmap["dcmotor"] = DCMOTOR;
 		commandmap["resistor"] = RESISTOR;
@@ -58,8 +65,11 @@ void initcomponentmapping(void) {
 		commandmap["micro"] = MICRO;
 		commandmap["mega"] = MEGA;
 		commandmap["infrared"] = INFRARED;
+		commandmap["servo"] = SERVO;
 		commandmap["nrf"] = NRF;
 		commandmap["micro"] = MICRO;
-
+		commandmap["dht11"] = DHT11;
+		commandmap["nodemcu"] = NODEMCU;
+		commandmap["accelerometer"] = ACCELEROMETER;
 	}
 }

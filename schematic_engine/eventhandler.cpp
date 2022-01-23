@@ -8,7 +8,22 @@ using namespace Gdiplus;
 
 int dragx1 = UNDEFCOORD, dragy1 = UNDEFCOORD, dragx2 = UNDEFCOORD, dragy2 = UNDEFCOORD;
 int oldx1 = UNDEFCOORD, oldy1 = UNDEFCOORD;
+HCURSOR mcursor;
 bool mousedragging = false;
+
+//Checks if a coordinate pair (in grid block units) is within any existing component bounds
+int withincompbounds(int xval, int yval) {
+	for (int i = 0; i < line.size(); i++) {
+		if (line[i].compmacro == WIRECOMP) continue;
+		if (xval + 1 >= line[i].params[0] && xval + 1 <= line[i].params[0] + XTOLERANCE &&
+			yval + 1 >= line[i].params[1] && yval + 1 <= line[i].params[1] + YTOLERANCE) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+//Mouse up event callback
 void mouseup(int x, int y) {
 	if (!mousedragging)
 		return;
@@ -21,17 +36,14 @@ void mouseup(int x, int y) {
 	dragy2 = y / gridstep;
 	//Using coordinates, check to see if there is a component that exists when finishing dragging maneuver
 	if (dragx1 != UNDEFCOORD && dragy1 != UNDEFCOORD) {
-		for (i = 0; i < line.size(); i++) {
-			if (oldx1 >= line[i].params[0] && oldx1 <= line[i].params[0] + XTOLERANCE && 
-				oldy1 >= line[i].params[1] && oldy1 <= line[i].params[1] + YTOLERANCE && 
-				strcmp(line[i].command, "wire") != 0) {
-				matchingcomp = true;
-				break;
-			}
+		i = withincompbounds(oldx1, oldy1);
+		if (i != -1) {
+			matchingcomp = true;
 		}
 	}
 	else return;
-	//Now if there was a matching component, the index, i, is the index of the component in the vector of electronic components, and thus we can use that
+	//Now if there was a matching component, the index, i, is the index of the component in the vector of electronic components, 
+	//and thus we can use that
 	if (matchingcomp == true && dragx2 != UNDEFCOORD && dragy2 != UNDEFCOORD) {
 		int dx, dy;
 		dx = line[i].params[2] - line[i].params[0];
@@ -52,25 +64,18 @@ void mouseup(int x, int y) {
 void mouselmove(int x, int y) {
 	hdc = GetDC(hWnd);
 	Graphics maingraph(memdc);
-	Pen whitepen(Color(255, 255, 255), 2.0F);
-	Pen mainpen(Color(255, 0, 72), 2.0F);
+	Pen whitepen(Color(255, 255, 255), 4.0F);
+	Pen mainpen(Color(255, 0, 72), 4.0F);
 	int amnt = gridstep;
 	static int gx = UNDEFCOORD, gy = UNDEFCOORD;
 	mousedragging = true;
-	if (gx != UNDEFCOORD && gy != UNDEFCOORD) {
-		Rect oldrect((gx * gridstep) + amnt, (gy * gridstep) + amnt, amnt, amnt);
-		maingraph.DrawRectangle(&whitepen, oldrect);
-	}
 	dragx1 = x / gridstep;
 	dragy1 = y / gridstep;
 	gx = x / gridstep;
 	gy = y / gridstep;
 	gx -= 1;
 	gy -= 1;
-	Rect normrect((gx * gridstep) + amnt, (gy * gridstep) + amnt, amnt, amnt);
-	maingraph.DrawRectangle(&mainpen, normrect);
-	rendergrid(memdc);
-	pushbuffer(hdc);
+	SetCursor(LoadCursor(NULL, IDC_SIZEALL));
 	ReleaseDC(hWnd, hdc);
 	maingraph.Flush();
 	return;
@@ -84,28 +89,50 @@ void mousermove(int x, int y) {
 void mousemove(int x, int y) {
 	hdc = GetDC(hWnd);
 	Graphics maingraph(hdc);
-	Pen whitepen(Color(255, 255, 255), 2.0F);
-	Pen mainpen(Color(0, 0, 255), 2.0F);
+	Pen whitepen(Color(255, 255, 255), 2.5F);
+	Pen mainpen(Color(0, 0, 255), 2.5F);
 	int amnt = gridstep;
 	int index;
 	static int gx = UNDEFCOORD, gy = UNDEFCOORD, indexstate = 0;
 	rendergrid(hdc);
-	if (gx != UNDEFCOORD && gy != UNDEFCOORD) {
-		Rect oldrect((gx * gridstep) + amnt, (gy * gridstep) + amnt, amnt, amnt);
-		maingraph.DrawRectangle(&whitepen, oldrect);
-	}
 	gx = x / gridstep;
 	gy = y / gridstep;
 	gx -= 1;
 	gy -= 1;
 	Rect normrect((gx * gridstep) + amnt, (gy * gridstep) + amnt, amnt, amnt);
-
+	if (withincompbounds(gx, gy)!=-1) {
+		normrect.Width += gridstep * 3;
+		normrect.Height += gridstep * 3;
+		mainpen.SetColor(Color(47, 219, 222));
+	}
+	
 	maingraph.DrawRectangle(&mainpen, normrect);
+	SetCursor(LoadCursor(NULL, IDC_CROSS));
 	ReleaseDC(hWnd, hdc);
 	maingraph.Flush();
 }
  
-//Left cursor click
+//Right mouse click
+void mouserbutton(int x, int y) {
+	hdc = GetDC(hWnd);
+	Graphics maingraph(memdc);
+	int gx, gy, indx;
+	gx = x / gridstep;
+	gy = y / gridstep;
+	gx -= 1;
+	gy -= 1;
+	indx = withincompbounds(gx, gy);
+	if (indx!=-1) {
+		line.erase(line.begin() + indx);
+		maingraph.Clear(Color(255, 255, 255));
+		renderboard(boardfn, 1);
+		rendergrid(memdc);
+		pushbuffer(hdc);
+	}
+	ReleaseDC(hWnd, hdc);
+}
+
+//Left mouse click
 void mouselbutton(int x, int y) {
 	struct instruct temp {};
 	static int buttondownstate = 0, fx = UNDEFCOORD, fy = UNDEFCOORD, gx = UNDEFCOORD, gy = UNDEFCOORD;

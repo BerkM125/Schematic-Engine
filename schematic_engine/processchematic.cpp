@@ -16,24 +16,10 @@ FILE* fp;
 int gridstep = 20;
 int currentstate = 0;
 
-Image* resistorhz;
-Image* dcmotorhz;
-Image* capacitorhz;
-Image* ledhz;
-Image* switchhz;
-Image* inductorhz;
-Image* megahz;
-Image* ultrasonichz;
-Image* infraredhz;
-Image* nrfhz;
-Image* servo;
-Image* micro;
-Image* buzzer;
-Image* nano;
-
 std::vector<struct instruct> line;
 bool invokestate = false;
 
+//Configures all preferred pen drawing settings, change to your liking
 void configurepensettings(Graphics* graph, Pen* mainpen, Pen* negativepen, Pen* positivepen) {
 	graph->SetSmoothingMode(SmoothingModeAntiAlias);
 	graph->SetTextRenderingHint(TextRenderingHintAntiAlias);
@@ -46,7 +32,8 @@ void configurepensettings(Graphics* graph, Pen* mainpen, Pen* negativepen, Pen* 
 	return;
 }
 
-void component::rendercomponent(HDC hdc) {
+//Draw a single component onto memory buffer using virtual device context
+void component::rendercomponent(void) {
 	static int configurationstate = 0;
 	Graphics graph(memdc);
 	Pen mainpen(Color(200, 128, 128, 128), (REAL)(gridstep / 3));
@@ -73,6 +60,9 @@ void component::rendercomponent(HDC hdc) {
 		micro = Image::FromFile(L"micro.PNG");
 		buzzer = Image::FromFile(L"buzzer.PNG");
 		nano = Image::FromFile(L"nano.PNG");
+		dht11 = Image::FromFile(L"dht11_2.png");
+		nodemcu = Image::FromFile(L"nodemcu.png");
+		accelerometer = Image::FromFile(L"accelerometer.png");
 	}
 	configurationstate += 1;
 	//Calculate coordinates according to circuit pin grid
@@ -110,10 +100,11 @@ void component::rendercomponent(HDC hdc) {
 		}
 		break;
 	}
-	pushbuffer(hdc);
+	
 	return;
 }
 
+//Set component object's coordinates in grid space
 void component::setcoords(int x, int y, int pole) {
 	if (pole == POSITIVE) {
 		positivexcoord = x;
@@ -126,11 +117,13 @@ void component::setcoords(int x, int y, int pole) {
 	return;
 }
 
+//Set orientation (currently deprecated), main component label value (numeric value)
 void component::setcompvalue(int ori, int val) {
 	orientation = ori;
 	compval = val;
 }
 
+//Set component image rendering coordinates
 void component::setrenderingcoords(float x1, float y1, float x2, float y2) {
 	pxdiff1 = x1;
 	pxdiff2 = x2;
@@ -157,6 +150,7 @@ component::component(int ctype, float renderx1, float rendery1, float renderx2, 
 	wcsncpy(unit, unitval, 16);
 }
 
+//Render grid lines in separate buffer, push to preferred buffer with the device context parameter 
 void rendergrid(HDC hdc) {
 	int x, y;
 	INT width, height;
@@ -183,41 +177,47 @@ void rendergrid(HDC hdc) {
 	return;
 }
 
-void processcommand(struct instruct cmd, unsigned int ptype) {
+//Processes single command in the form of an instruct structure pointer
+void processcommand(struct instruct *cmd, unsigned int ptype) {
 	//Depending on ptype, function will check for either string field or integer field for the component
+	wchar_t tempstr[16];
 	hdc = GetDC(hWnd);
 	component comp;
-	if (strcmp(cmd.command, "wire") == 0 || cmd.compmacro == WIRECOMP) {
-		comp.setcoords(cmd.params[0], cmd.params[1], POSITIVE);
-		comp.setcoords(cmd.params[2], cmd.params[3], NEGATIVE);
+	if (strcmp(cmd->command, "wire") == 0 || cmd->compmacro == WIRECOMP) {
+		comp.setcoords(cmd->params[0], cmd->params[1], POSITIVE);
+		comp.setcoords(cmd->params[2], cmd->params[3], NEGATIVE);
 		comp.comptype = WIRECOMP;
-		comp.rendercomponent(hdc);
+		comp.rendercomponent();
+		cmd->compmacro = WIRECOMP;
 	}
 	else {
 		switch (ptype) {
 		//In this case, file loading won't set the integer component field by itself,
 		//meaning we must fall back onto the string field
 		case PROCESS_FILETYPE:
-			comp = componentmap[commandmap[cmd.command]];
-			break;
+			{
+				cmd->compmacro = commandmap[cmd->command];
+				comp = componentmap[cmd->compmacro];
+				break;
+			}
 		//Objects from a list/stack are guaranteed to have a valid integer component field
 		case PROCESS_STACKTYPE: 
 			{
-				wchar_t tempstr[16];
-				comp = componentmap[cmd.compmacro];
-				//Might make label value a constructor field later
-				comp.setcompvalue(cmd.params[2], cmd.params[3]);
-				wsprintf(tempstr, comp.unit, comp.compval);
-				wcsncpy(comp.unit, tempstr, 16);
+				comp = componentmap[cmd->compmacro];
 				break;
 			}
 		}
-		comp.setcoords(cmd.params[0], cmd.params[1], POSITIVE);
-		comp.setcoords(cmd.params[0] + gridstep * 3, cmd.params[1] + gridstep * 3, NEGATIVE);
-		comp.rendercomponent(hdc);
+		//Might make label value a constructor field later
+		comp.setcompvalue(cmd->params[2], cmd->params[3]);
+		wsprintf(tempstr, comp.unit, comp.compval);
+		wcsncpy(comp.unit, tempstr, 16);
+		comp.setcoords(cmd->params[0], cmd->params[1], POSITIVE);
+		comp.setcoords(cmd->params[0] + gridstep * 3, cmd->params[1] + gridstep * 3, NEGATIVE);
+		comp.rendercomponent();
 	}
 }
 
+//Saves current board state to a file determined by fn
 void saveboard(const char* fn) {
 	fp = fopen(fn, "w+");
 	if (fp == NULL)
@@ -232,6 +232,7 @@ void saveboard(const char* fn) {
 	return;
 }
 
+//Empty component/instruct structure stack or list
 std::vector<struct instruct>* emptystack(std::vector<struct instruct>* stack) {
 	int sz = stack->size();
 	int index = 0;
@@ -240,6 +241,8 @@ std::vector<struct instruct>* emptystack(std::vector<struct instruct>* stack) {
 	return stack;
 }
 
+//Renders a full board from a file name or from loaded component list (line).
+//File loading / list loading determined by mode
 int renderboard(const char* boardfile, int mode) {
 	struct instruct temp;
 	int index = 0, params[4];
@@ -266,14 +269,15 @@ int renderboard(const char* boardfile, int mode) {
 			index++;
 		}
 		for (int i = 0; i < index; i++)
-			processcommand(line[i], PROCESS_FILETYPE);
+			processcommand(&line[i], PROCESS_FILETYPE);
 		fclose(fp);
 	}
 	//Mode 1 indicates a loaded stack, in this mode the program 
 	//simply iterates and renders based on stored data in the list
 	else
 		for (int i = 0; i < line.size(); i++)
-			processcommand(line[i], PROCESS_STACKTYPE);
+			processcommand(&line[i], PROCESS_STACKTYPE);
+	pushbuffer(hdc);
 	return (0);
 }
 
@@ -287,6 +291,7 @@ void pushbuffer(HDC hdc) {
 	BitBlt(hdc, 0, 0, width, height, memdc, 0, 0, SRCCOPY);
 }
 
+//Main full rendering function
 VOID MainRender(HDC hdc) {
 	int x, y;
 	INT width, height;
@@ -306,8 +311,10 @@ VOID MainRender(HDC hdc) {
 	maingraphics.SetSmoothingMode(SmoothingModeNone);
 
 	rendergrid(memdc);
-	if (invokestate == false)
+	if (invokestate == false) {
 		renderboard(boardfn, 0);
+		invokestate = true;
+	}
 	else
 		renderboard(boardfn, 1);
 	fp = fopen("slotfile.txt", "r+");

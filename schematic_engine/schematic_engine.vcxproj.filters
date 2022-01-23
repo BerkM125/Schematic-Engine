@@ -47,6 +47,12 @@
     <ClCompile Include="parametricmapping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="resourceptrs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="undoredo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="schematic_engine.rc">

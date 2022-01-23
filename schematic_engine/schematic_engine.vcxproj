@@ -150,7 +150,9 @@
     <ClCompile Include="eventhandler.cpp" />
     <ClCompile Include="parametricmapping.cpp" />
     <ClCompile Include="processchematic.cpp" />
+    <ClCompile Include="resourceptrs.cpp" />
     <ClCompile Include="schematic_engine.cpp" />
+    <ClCompile Include="undoredo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="schematic_engine.rc" />
