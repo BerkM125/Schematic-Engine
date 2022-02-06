@@ -10,6 +10,7 @@
 #include <vector>
 #include <map>
 #include <thread>
+#include <unordered_set>
 using namespace Gdiplus;
 #pragma comment (lib,"gdiplus.lib")
 #define UNDEFCOORD 99999
@@ -104,6 +105,31 @@ private:
 	float pydiff2;
 }; 
 
+//BST tree hierarchy structure based on component x-coordinate values 
+class componentTreeHierarchy {
+public:
+	componentTreeHierarchy() {
+		val = 0;
+		left = NULL;
+		right = NULL;
+	}
+
+	std::vector<int> searchHierarchy(int target);
+	void traverse(void);
+	void insertComponent(int target, int data);
+	//int searchHierarchy(struct instruct);
+	//void insertComponent(struct instruct);
+private:
+	int val;
+	std::vector<int> positionval;
+	std::unordered_set<int> positionset;
+	componentTreeHierarchy* left;
+	componentTreeHierarchy* right;
+
+	void searchHierarchyUtil(componentTreeHierarchy* node, int target, std::vector<int>& holder);
+};
+
+extern componentTreeHierarchy mainhierarchy;
 extern Image* resistorhz;
 extern Image* dcmotorhz;
 extern Image* capacitorhz;

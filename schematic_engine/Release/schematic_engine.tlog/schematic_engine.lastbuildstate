@@ -1,2 +1,2 @@
-PlatformToolSet=v142:VCToolArchitecture=Native32Bit:VCToolsVersion=14.28.29333:TargetPlatformVersion=10.0.18362.0:
+PlatformToolSet=v142:VCToolArchitecture=Native32Bit:VCToolsVersion=14.29.30133:VCServicingVersionCrtHeaders=14.29.30136:TargetPlatformVersion=10.0.19041.0:VcpkgTriplet=x86-windows:
 Release|Win32|C:\Berkan\VisualStudio\schematic_engine\|

@@ -1,2 +1,2 @@
-resistor 0 3 1 100
+nano 0 3 1 220
 END 0 0 0 0

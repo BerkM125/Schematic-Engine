@@ -15,7 +15,7 @@ using namespace Gdiplus;
 FILE* fp;
 int gridstep = 20;
 int currentstate = 0;
-
+componentTreeHierarchy mainhierarchy;
 std::vector<struct instruct> line;
 bool invokestate = false;
 
@@ -268,15 +268,19 @@ int renderboard(const char* boardfile, int mode) {
 			line.push_back(temp);
 			index++;
 		}
-		for (int i = 0; i < index; i++)
+		for (int i = 0; i < index; i++) {
 			processcommand(&line[i], PROCESS_FILETYPE);
+			if(line.size() >= 1) mainhierarchy.insertComponent(line[i].params[0], i);
+		}
 		fclose(fp);
 	}
 	//Mode 1 indicates a loaded stack, in this mode the program 
 	//simply iterates and renders based on stored data in the list
 	else
-		for (int i = 0; i < line.size(); i++)
+		for (int i = 0; i < line.size(); i++) {
 			processcommand(&line[i], PROCESS_STACKTYPE);
+			mainhierarchy.insertComponent((line[i].params[0]), i);
+		}
 	pushbuffer(hdc);
 	return (0);
 }
@@ -317,6 +321,8 @@ VOID MainRender(HDC hdc) {
 	}
 	else
 		renderboard(boardfn, 1);
+	
+	//std::cout << "BRUH" << std::endl;
 	fp = fopen("slotfile.txt", "r+");
 	fgets(currentcommand, 16, fp);
 	fclose(fp);

@@ -53,6 +53,9 @@
     <ClCompile Include="undoredo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="compstructuring.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="schematic_engine.rc">

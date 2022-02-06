@@ -48,6 +48,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_SCHEMATICENGINE, szWindowClass, MAX_LOADSTRING);
+
+    //UNCOMMENT FOR CONSOLE DEBUGGING
+    FILE* fp;
+
+    AllocConsole();
+    freopen_s(&fp, "CONIN$", "r", stdin);
+    freopen_s(&fp, "CONOUT$", "w", stdout);
+    freopen_s(&fp, "CONOUT$", "w", stderr);
+
     MyRegisterClass(hInstance);
     if (!InitInstance (hInstance, nCmdShow))
     {

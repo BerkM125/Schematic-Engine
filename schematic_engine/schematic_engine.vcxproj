@@ -146,6 +146,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="compstructuring.cpp" />
     <ClCompile Include="filehandler.cpp" />
     <ClCompile Include="eventhandler.cpp" />
     <ClCompile Include="parametricmapping.cpp" />

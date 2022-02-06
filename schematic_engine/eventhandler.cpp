@@ -1,9 +1,11 @@
 #include <windows.h>
 #include <objidl.h>
 #include <gdiplus.h>
+#include <vector>
 #include "schematic_engine.h"
 #include "schem.h"
 using namespace Gdiplus;
+using namespace std;
 #pragma comment (lib,"gdiplus.lib")
 
 int dragx1 = UNDEFCOORD, dragy1 = UNDEFCOORD, dragx2 = UNDEFCOORD, dragy2 = UNDEFCOORD;
@@ -12,12 +14,24 @@ HCURSOR mcursor;
 bool mousedragging = false;
 
 //Checks if a coordinate pair (in grid block units) is within any existing component bounds
-int withincompbounds(int xval, int yval) {
-	for (int i = 0; i < line.size(); i++) {
-		if (line[i].compmacro == WIRECOMP) continue;
+int withincompbounds(int xval, int yval, bool wirecheck) {
+	/*for (int i = 0; i < line.size(); i++) {
+		if (line[i].compmacro == WIRECOMP && !wirecheck) continue;
 		if (xval + 1 >= line[i].params[0] && xval + 1 <= line[i].params[0] + XTOLERANCE &&
 			yval + 1 >= line[i].params[1] && yval + 1 <= line[i].params[1] + YTOLERANCE) {
 			return i;
+		}
+	}*/
+	vector<int> list = mainhierarchy.searchHierarchy(xval);
+	if (list.size() == 0) return -1;
+	std::cout << list.size() << std::endl;
+	//mainhierarchy.traverse();
+	for (int i = 0; i < list.size(); i++) {
+		//cout << "XCOORD: " << xval << " LIST[I]: " << list[i] << " LINE[LIST[I]]: " << line[list[i]].params[0] << endl;
+		if (line[list[i]].compmacro == WIRECOMP && !wirecheck) continue;
+		if (xval + 1 >= line[list[i]].params[0] && xval + 1 <= line[list[i]].params[0] + XTOLERANCE &&
+			yval + 1 >= line[list[i]].params[1] && yval + 1 <= line[list[i]].params[1] + YTOLERANCE) {
+			return list[i];
 		}
 	}
 	return -1;
@@ -36,7 +50,8 @@ void mouseup(int x, int y) {
 	dragy2 = y / gridstep;
 	//Using coordinates, check to see if there is a component that exists when finishing dragging maneuver
 	if (dragx1 != UNDEFCOORD && dragy1 != UNDEFCOORD) {
-		i = withincompbounds(oldx1, oldy1);
+		i = withincompbounds(oldx1, oldy1, false);
+		//cout << i << endl;
 		if (i != -1) {
 			matchingcomp = true;
 		}
@@ -100,7 +115,7 @@ void mousemove(int x, int y) {
 	gx -= 1;
 	gy -= 1;
 	Rect normrect((gx * gridstep) + amnt, (gy * gridstep) + amnt, amnt, amnt);
-	if (withincompbounds(gx, gy)!=-1) {
+	if (withincompbounds(gx+1, gy+1, false)!=-1) {
 		normrect.Width += gridstep * 3;
 		normrect.Height += gridstep * 3;
 		mainpen.SetColor(Color(47, 219, 222));
@@ -121,7 +136,7 @@ void mouserbutton(int x, int y) {
 	gy = y / gridstep;
 	gx -= 1;
 	gy -= 1;
-	indx = withincompbounds(gx, gy);
+	indx = withincompbounds(gx, gy, false);
 	if (indx!=-1) {
 		line.erase(line.begin() + indx);
 		maingraph.Clear(Color(255, 255, 255));
@@ -138,6 +153,7 @@ void mouselbutton(int x, int y) {
 	static int buttondownstate = 0, fx = UNDEFCOORD, fy = UNDEFCOORD, gx = UNDEFCOORD, gy = UNDEFCOORD;
 	oldx1 = x / gridstep;
 	oldy1 = y / gridstep;
+	mainhierarchy.searchHierarchy(oldx1);
 	if (selectedcomponent != UNDEFCOMP) {
 		if (buttondownstate == 0) {
 			fx = x / gridstep;
